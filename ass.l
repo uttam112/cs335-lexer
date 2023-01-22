@@ -21,7 +21,6 @@ digit [0-9]
 "["|"]" {if(mm[yytext]==0)v.push_back(make_pair(yytext,"Seperator"));mm[yytext]++;}
 [[:alpha:]][[:alnum:]]* {if(mm[yytext]==0)v.push_back(make_pair(yytext,"Identifier"));mm[yytext]++;}
 
-[0-9]+[[:alpha:]] {printf("Error: not a identifier %d \n",lineNum);return 0;}
 
 [0-9]+ {if(mm[yytext]==0)v.push_back(make_pair(yytext,"Literal"));mm[yytext]++;}
 [0-9]+[.][0-9]+ {if(mm[yytext]==0)v.push_back(make_pair(yytext,"Literal"));mm[yytext]++;}
@@ -30,7 +29,7 @@ digit [0-9]
 (-?)[0-9]+E(-?)[0-9]+ {if(mm[yytext]==0)v.push_back(make_pair(yytext,"Literal"));mm[yytext]++;}
 [0-9]+[.][0-9]+E(-?)[0-9]+ {if(mm[yytext]==0)v.push_back(make_pair(yytext,"Literal"));mm[yytext]++;}
 \"(\\.|[^"\\])*\" {if(mm[yytext]==0)v.push_back(make_pair(yytext,"String Literal"));mm[yytext]++;}
-. {printf("%s,Error on line %d\n", yytext,lineNum); return 0;}
+. {cerr<<"Error on line "<<lineNum<<" "<<"unidentified :"<<yytext<<"\n"; return 0;}
 <<EOF>> {return 0;}
 %%
 
