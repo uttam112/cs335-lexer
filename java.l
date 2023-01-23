@@ -8,19 +8,33 @@ int lineNum=1;
 
 D [0-9]
 D_ {D}[0-9_]*{D}
-L [a-zA-Z_$]
-LD [a-zA-Z_$0-9]
+DD ({D}|{D_})
+E [Ee][+-]?{DD}
+
+
+
 H [a-fA-F0-9]
-H_ [a-fA-F0-9_]
+H_ {H}[a-fA-F0-9_]*{H}
+HH ({H}|{H_})
+P [Pp][+-]?{HH}
+
+
 B [01]
-B_ [01_]
+B_ {B}[01_]*{B}
+BB ({B}|{B_})
+
+
+
 O [0-7]
-O_ [0-7_]
-E [Ee][+-]?{D}+
+O_ [0-7_]*
+OO ({O}|{O_})
+
+
 FD (f|F|d|D)
 Ll (l|L)*
-P [Pp][+-]?{H}+
 
+L [a-zA-Z_$]
+LD [a-zA-Z_$0-9]
 
 %%
 [\n"\r\n"] {lineNum++;}
@@ -48,37 +62,25 @@ P [Pp][+-]?{H}+
 
 
 
-[1-9]+[0-9_]*[1-9]+{Ll}?   {if(mm[yytext]==0)v.push_back(make_pair(yytext,"Literal"));mm[yytext]++;}
-[1-9][0-9]*{Ll}?           {if(mm[yytext]==0)v.push_back(make_pair(yytext,"Literal"));mm[yytext]++;}
+[1-9][0-9_]*[0-9]{Ll}?   {if(mm[yytext]==0)v.push_back(make_pair(yytext,"Literal"));mm[yytext]++;}
+[1-9]{Ll}?           {if(mm[yytext]==0)v.push_back(make_pair(yytext,"Literal"));mm[yytext]++;}
+{DD}{E}{FD}?                            {if(mm[yytext]==0)v.push_back(make_pair(yytext,"float"));mm[yytext]++;}
+"0f"                                    {if(mm[yytext]==0)v.push_back(make_pair(yytext,"float"));mm[yytext]++;}
+{DD}*"."{DD}+({E})?{FD}?                {if(mm[yytext]==0)v.push_back(make_pair(yytext,"float"));mm[yytext]++;}
+{DD}+"."{DD}*({E})?{FD}?                {if(mm[yytext]==0)v.push_back(make_pair(yytext,"float"));mm[yytext]++;}
 
 
-0[xX]{H}+{H_}*{H}+{Ll}?    {if(mm[yytext]==0)v.push_back(make_pair(yytext,"Hex"));mm[yytext]++;}
-0[xX]{H}+{Ll}?             {if(mm[yytext]==0)v.push_back(make_pair(yytext,"Hex"));mm[yytext]++;}
+0[xX]{HH}{P}{FD}?  {if(mm[yytext]==0)v.push_back(make_pair(yytext,"Hex"));mm[yytext]++;}
+0[xX]{HH}+{Ll}?    {if(mm[yytext]==0)v.push_back(make_pair(yytext,"Hex"));mm[yytext]++;}
+0[xX]{HH}*"."{HH}+({P})?{FD}?                {if(mm[yytext]==0)v.push_back(make_pair(yytext,"float"));mm[yytext]++;}
+0[xX]{HH}+"."{HH}*({P})?{FD}?                {if(mm[yytext]==0)v.push_back(make_pair(yytext,"float"));mm[yytext]++;}
 
-0[bB]{B}+{B_}*{B}+{Ll}?    {if(mm[yytext]==0)v.push_back(make_pair(yytext,"Binary"));mm[yytext]++;}
-0[bB]{B}+{Ll}?             {if(mm[yytext]==0)v.push_back(make_pair(yytext,"Binary"));mm[yytext]++;}
-
-
-0{O}+{O_}*{O}+{Ll}? {if(mm[yytext]==0)v.push_back(make_pair(yytext,"Octal"));mm[yytext]++;}
-0{O}+{Ll}?          {if(mm[yytext]==0)v.push_back(make_pair(yytext,"Octal"));mm[yytext]++;}
-0{Ll}?              {if(mm[yytext]==0)v.push_back(make_pair(yytext,"literal"));mm[yytext]++;}
+0[bB]{BB}{Ll}?    {if(mm[yytext]==0)v.push_back(make_pair(yytext,"Binary"));mm[yytext]++;}
 
 
-{D}+{E}?{FD}?                         {if(mm[yytext]==0)v.push_back(make_pair(yytext,"float literal"));mm[yytext]++;}
-{D_}{E}?{D_}?{FD}?                    {if(mm[yytext]==0)v.push_back(make_pair(yytext,"float literal"));mm[yytext]++;}
-{D}+{E}?{D_}?{FD}?                    {if(mm[yytext]==0)v.push_back(make_pair(yytext,"float literal"));mm[yytext]++;}
-0[Xx]{H}+{P}?{FD}?                    {if(mm[yytext]==0)v.push_back(make_pair(yytext,"hex literal"));mm[yytext]++;}
-0[Xx]{H}+{H_}*{H}+{P}?{FD}?           {if(mm[yytext]==0)v.push_back(make_pair(yytext,"hex literal"));mm[yytext]++;}
 
+0{OO}*{Ll}? {if(mm[yytext]==0)v.push_back(make_pair(yytext,"Octal"));mm[yytext]++;}
 
-{D}*"."{D}+({E})?{FD}?                {if(mm[yytext]==0)v.push_back(make_pair(yytext,"float"));mm[yytext]++;}
-{D}+"."{D}*({E})?{FD}?                {if(mm[yytext]==0)v.push_back(make_pair(yytext,"float"));mm[yytext]++;}
-
-
-0[xX]{H}*"."{H}+({P})?{FD}?                   {if(mm[yytext]==0)v.push_back(make_pair(yytext,"Literal"));mm[yytext]++;}
-0[xX]{H}*"."{H}+{H_}*{H}+({P})?{FD}?          {if(mm[yytext]==0)v.push_back(make_pair(yytext,"Literal"));mm[yytext]++;}
-0[xX]{H}+{H_}*{H}+"."{H}+({P})?{FD}?          {if(mm[yytext]==0)v.push_back(make_pair(yytext,"Literal"));mm[yytext]++;}
-0[xX]{H}+{H_}*{H}+"."{H}+{H_}*{H}+({P})?{FD}? {if(mm[yytext]==0)v.push_back(make_pair(yytext,"Literal"));mm[yytext]++;}
 
 
 "null"                                             {if(mm[yytext]==0)v.push_back(make_pair(yytext,"null"));mm[yytext]++;}
