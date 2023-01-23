@@ -1,4 +1,6 @@
 Lexeme,Token,Count
-1e-9,Literal,1
-1.2e+22,Literal,1
-1.2e-88,Literal,1
+"klasjf;saj\n\n",String,1
+"""
+ksjdf;
+kfsdlfj\n\n
+""",Text Block,1
