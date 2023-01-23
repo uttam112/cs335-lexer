@@ -8,7 +8,7 @@ int lineNum = 1;
 
 E [Ee]
 %%
-[\n] {lineNum++;}
+[\n"\r\n"] {lineNum++;}
 [ \t\v\f]+ {/* eat up whitespace */}
 [{][^}]*[}] {char* s=yytext;char *p=strchr(s,'\n');while(p!=NULL){lineNum++;p=strchr(p+1,'\n');}}
 
