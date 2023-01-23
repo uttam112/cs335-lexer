@@ -33,15 +33,15 @@ OO ({O}|{O_})
 FD (f|F|d|D)
 Ll (l|L)*
 
-L [a-zA-Z_$]
+L [a-zA-Z_]
 LD [a-zA-Z_$0-9]
 
 %%
 [\n"\r\n"] {lineNum++;}
-[ \t\f\r]+ {/* eat up whitespace */}
+[ \t\f\r]+ {}
  
-"//".* { /* DO NOTHING */ }
-[/][*][^*]*[*]+([^*/][^*]*[*]+)*[/] { /* DO NOTHING */ }
+"//".* {}
+[/][*][^*]*[*]+([^*/][^*]*[*]+)*[/] {{char* s=yytext;char *p=strchr(s,'\n');while(p!=NULL){lineNum++;p=strchr(p+1,'\n');}}}
  
  
  
@@ -64,31 +64,31 @@ LD [a-zA-Z_$0-9]
 
 [1-9][0-9_]*[0-9]{Ll}?   {if(mm[yytext]==0)v.push_back(make_pair(yytext,"Literal"));mm[yytext]++;}
 [1-9]{Ll}?           {if(mm[yytext]==0)v.push_back(make_pair(yytext,"Literal"));mm[yytext]++;}
-{DD}{E}{FD}?                            {if(mm[yytext]==0)v.push_back(make_pair(yytext,"float"));mm[yytext]++;}
-"0f"                                    {if(mm[yytext]==0)v.push_back(make_pair(yytext,"float"));mm[yytext]++;}
-{DD}*"."{DD}+({E})?{FD}?                {if(mm[yytext]==0)v.push_back(make_pair(yytext,"float"));mm[yytext]++;}
-{DD}+"."{DD}*({E})?{FD}?                {if(mm[yytext]==0)v.push_back(make_pair(yytext,"float"));mm[yytext]++;}
+{DD}{E}{FD}?                            {if(mm[yytext]==0)v.push_back(make_pair(yytext,"Literal"));mm[yytext]++;}
+"0f"                                    {if(mm[yytext]==0)v.push_back(make_pair(yytext,"Literal"));mm[yytext]++;}
+{DD}*"."{DD}+({E})?{FD}?                {if(mm[yytext]==0)v.push_back(make_pair(yytext,"Literal"));mm[yytext]++;}
+{DD}+"."{DD}*({E})?{FD}?                {if(mm[yytext]==0)v.push_back(make_pair(yytext,"Literal"));mm[yytext]++;}
 
 
-0[xX]{HH}{P}{FD}?  {if(mm[yytext]==0)v.push_back(make_pair(yytext,"Hex"));mm[yytext]++;}
-0[xX]{HH}+{Ll}?    {if(mm[yytext]==0)v.push_back(make_pair(yytext,"Hex"));mm[yytext]++;}
-0[xX]{HH}*"."{HH}+({P})?{FD}?                {if(mm[yytext]==0)v.push_back(make_pair(yytext,"float"));mm[yytext]++;}
-0[xX]{HH}+"."{HH}*({P})?{FD}?                {if(mm[yytext]==0)v.push_back(make_pair(yytext,"float"));mm[yytext]++;}
+0[xX]{HH}{P}{FD}?  {if(mm[yytext]==0)v.push_back(make_pair(yytext,"Literal"));mm[yytext]++;}
+0[xX]{HH}+{Ll}?    {if(mm[yytext]==0)v.push_back(make_pair(yytext,"Literal"));mm[yytext]++;}
+0[xX]{HH}*"."{HH}+({P})?{FD}?                {if(mm[yytext]==0)v.push_back(make_pair(yytext,"Literal"));mm[yytext]++;}
+0[xX]{HH}+"."{HH}*({P})?{FD}?                {if(mm[yytext]==0)v.push_back(make_pair(yytext,"Literal"));mm[yytext]++;}
 
-0[bB]{BB}{Ll}?    {if(mm[yytext]==0)v.push_back(make_pair(yytext,"Binary"));mm[yytext]++;}
+0[bB]{BB}{Ll}?    {if(mm[yytext]==0)v.push_back(make_pair(yytext,"Literal"));mm[yytext]++;}
 
 
 
-0{OO}*{Ll}? {if(mm[yytext]==0)v.push_back(make_pair(yytext,"Octal"));mm[yytext]++;}
+0{OO}*{Ll}? {if(mm[yytext]==0)v.push_back(make_pair(yytext,"Literal"));mm[yytext]++;}
 
 
 
 "null"                                             {if(mm[yytext]==0)v.push_back(make_pair(yytext,"null"));mm[yytext]++;}
-\"(\\.|[^"\\])*\"                                  {if(mm[yytext]==0)v.push_back(make_pair(yytext,"String"));mm[yytext]++;}
+\"([^\\\"]|\\.)*\"                                 {if(mm[yytext]==0)v.push_back(make_pair(yytext,"String"));mm[yytext]++;}
 \"\"\"(\\.|[^"\\])*\"\"\"                          {if(mm[yytext]==0)v.push_back(make_pair(yytext,"Text Block"));mm[yytext]++;}
 "("|")"|"{"|"}"|"["|"]"|";"|","|"."|"..."|"@"|"::" {if(mm[yytext]==0)v.push_back(make_pair(yytext,"Seperator"));mm[yytext]++;}
 
-L?'(\\.|[^\\'])+'                                  {if(mm[yytext]==0)v.push_back(make_pair(yytext,"char"));mm[yytext]++;}
+'(\\.|[^\\'])+'                                  {if(mm[yytext]==0)v.push_back(make_pair(yytext,"char"));mm[yytext]++;}
 
 
 
@@ -100,7 +100,7 @@ L?'(\\.|[^\\'])+'                                  {if(mm[yytext]==0)v.push_back
 
 "true"|"false"         {if(mm[yytext]==0)v.push_back(make_pair(yytext,"Literal"));mm[yytext]++;}
 {L}+{LD}*              {if(mm[yytext]==0)v.push_back(make_pair(yytext,"Identifier"));mm[yytext]++;}
-.                      {cerr<<"Error on line "<<lineNum<<" "<<"unidentified :"<<yytext<<"\n";}
+.                      {cerr<<"Error on line "<<lineNum<<" "<<"unidentified :"<<yytext<<"\n";return 0;}
 
 %%
 

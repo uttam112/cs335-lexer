@@ -6,12 +6,11 @@ vector<pair<string,string>> v;
 int lineNum = 1;
 %}
 
-let [a-zA-z]
-digit [0-9]
+E [Ee]
 %%
 [\n] {lineNum++;}
 [ \t\v\f]+ {/* eat up whitespace */}
-[{][^}]*[}] {}
+[{][^}]*[}] {char* s=yytext;char *p=strchr(s,'\n');while(p!=NULL){lineNum++;p=strchr(p+1,'\n');}}
 
 "+"|"-"|"*"|"/"|":="|"<>"|"<="|">="|"="|"<"|">"|"."|"and"|"or"|"not"|"div"|"mod"|"in"|"^" {if(mm[yytext]==0)v.push_back(make_pair(yytext,"Operator"));mm[yytext]++;}
 
@@ -26,9 +25,9 @@ digit [0-9]
 [0-9]+[.][0-9]+ {if(mm[yytext]==0)v.push_back(make_pair(yytext,"Literal"));mm[yytext]++;}
 ^[-][0-9]+ {if(mm[yytext]==0)v.push_back(make_pair(yytext,"Literal"));mm[yytext]++;} /* ^ means only at beginning of a line */
 ^[-][0-9]+[.][0-9]+ {if(mm[yytext]==0)v.push_back(make_pair(yytext,"Literal"));mm[yytext]++;}
-(-?)[0-9]+E(-?)[0-9]+ {if(mm[yytext]==0)v.push_back(make_pair(yytext,"Literal"));mm[yytext]++;}
-[0-9]+[.][0-9]+E(-?)[0-9]+ {if(mm[yytext]==0)v.push_back(make_pair(yytext,"Literal"));mm[yytext]++;}
-\"(\\.|[^"\\])*\" {if(mm[yytext]==0)v.push_back(make_pair(yytext,"String Literal"));mm[yytext]++;}
+[0-9]+{E}[+-]?[0-9]+ {if(mm[yytext]==0)v.push_back(make_pair(yytext,"Literal"));mm[yytext]++;}
+[0-9]+[.][0-9]+{E}[+-]?[0-9]+ {if(mm[yytext]==0)v.push_back(make_pair(yytext,"Literal"));mm[yytext]++;}
+\"(\\.|[^"\\])*\" {if(mm[yytext]==0)v.push_back(make_pair(yytext,"String"));mm[yytext]++;}
 . {cerr<<"Error on line "<<lineNum<<" "<<"unidentified :"<<yytext<<"\n"; return 0;}
 <<EOF>> {return 0;}
 %%
