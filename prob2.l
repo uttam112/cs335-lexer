@@ -85,7 +85,7 @@ LD [a-zA-Z_$0-9]
 
 "null"                                             {if(mm[yytext]==0)v.push_back(make_pair(yytext,"null"));mm[yytext]++;}
 \"([^\\\"]|\\.)*\"                                 {if(mm[yytext]==0)v.push_back(make_pair(yytext,"String"));mm[yytext]++;}
-\"\"\"(\\.|[^"\\])*\"\"\"                          {if(mm[yytext]==0)v.push_back(make_pair(yytext,"Text Block"));mm[yytext]++;{char* s=yytext;char *p=strchr(s,'\n');while(p!=NULL){lineNum++;p=strchr(p+1,'\n');}}}
+\"\"\"[^"](["][^"]|["]["][^"]|[^"])*\"\"\"         {if(mm[yytext]==0)v.push_back(make_pair(yytext,"Text Block"));mm[yytext]++;{char* s=yytext;char *p=strchr(s,'\n');while(p!=NULL){lineNum++;p=strchr(p+1,'\n');}}}
 "("|")"|"{"|"}"|"["|"]"|";"|","|"."|"..."|"@"|"::" {if(mm[yytext]==0)v.push_back(make_pair(yytext,"Seperator"));mm[yytext]++;}
 
 '(\\.|[^\\'])+'                                  {if(mm[yytext]==0)v.push_back(make_pair(yytext,"char"));mm[yytext]++;}

@@ -9,7 +9,7 @@ int lineNum = 1;
 E [Ee]
 %%
 [\n"\r\n"] {lineNum++;}
-[ \t\v\f]+ {/* eat up whitespace */}
+[ \t\v\f]+ {}
 [{][^}]*[}] {char* s=yytext;char *p=strchr(s,'\n');while(p!=NULL){lineNum++;p=strchr(p+1,'\n');}}
 
 "+"|"-"|"*"|"/"|":="|"<>"|"<="|">="|"="|"<"|">"|"."|"and"|"or"|"not"|"div"|"mod"|"in"|"^" {if(mm[yytext]==0)v.push_back(make_pair(yytext,"Operator"));mm[yytext]++;}
